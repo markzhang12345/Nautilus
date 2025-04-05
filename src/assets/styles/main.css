@@ -91,6 +91,49 @@
   color: #1d4ed8;
 }
 
+/* 新增样式 */
+.timer-status-container,
+.circle-status-container {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.current-mode-status,
+.circle-mode-status,
+.circle-pattern-status {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.status-label {
+  font-weight: 500;
+  color: #adb5bd;
+}
+
+.status-value {
+  font-weight: 600;
+}
+
+.status-value.pomodoro {
+  color: #ff6b6b;
+}
+
+.status-value.shortBreak {
+  color: #51cf66;
+}
+
+.status-value.longBreak {
+  color: #339af0;
+}
+
+.status-value.active {
+  color: #fcc419;
+}
+
 /* Timer Mode Buttons */
 .timer-mode-buttons {
   display: flex;
@@ -177,6 +220,14 @@
 
 .reset-button:hover:not(:disabled) {
   background-color: #dc2626;
+}
+
+.circle-button {
+  background-color: #2e94d4;
+}
+
+.circle-button:hover:not(:disabled) {
+  background-color: #247fb8;
 }
 
 /* Current Task */

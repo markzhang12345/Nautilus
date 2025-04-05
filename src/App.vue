@@ -1,86 +1,84 @@
 <template>
   <div class="app-container">
     <div class="app-content">
-      <h1 class="app-title">TideTask</h1>
+      <h1 class="app-title">Nautilus</h1>
 
       <div class="main-grid">
-        <!-- 计时器面板 -->
         <div class="timer-panel">
           <h2 class="panel-title">Timer</h2>
 
-          <!-- 计时器显示容器 -->
           <div class="timer-display-container">
-            <!-- 计时器显示，根据当前模式添加不同的CSS类 -->
             <div class="timer-display" :class="timerMode">
               {{ formatTime(timer) }}
             </div>
           </div>
 
-          <!-- 计时器模式按钮组 -->
-          <div class="timer-mode-buttons">
-            <!-- 专注模式按钮（番茄工作时段） -->
-            <!-- 通过active类切换模式 -->
-            <button @click="setTimerMode('pomodoro')" class="mode-button" :class="{ active: timerMode === 'pomodoro' }">Focus</button>
-            <!-- 短休息模式按钮 -->
-            <button @click="setTimerMode('shortBreak')" class="mode-button" :class="{ active: timerMode === 'shortBreak' }">Short</button>
-            <!-- 长休息模式按钮 -->
-            <button @click="setTimerMode('longBreak')" class="mode-button" :class="{ active: timerMode === 'longBreak' }">Long</button>
-            <!-- 考虑增加专注 - 短修 - 专注 - 长修 循环 -->
+          <!-- 第一个新增区域：当前模式状态显示 -->
+          <div class="timer-status-container">
+            <div class="current-mode-status">
+              <span class="status-label">Current Mode :</span>
+              <span class="status-value" :class="timerMode">
+                {{ getModeDisplayName(timerMode) }}
+              </span>
+            </div>
+            <div class="circle-mode-status">
+              <span class="status-label">Circle Mode:</span>
+              <span class="status-value" :class="{ active: isInCircleMode }">
+                {{ isInCircleMode ? "On" : "Off" }}
+              </span>
+            </div>
+            <div v-if="isInCircleMode" class="circle-pattern-status">
+              <span class="status-label">Circle Progress:</span>
+              <span class="status-value"> {{ circleIndex + 1 }}/{{ circlePattern.length }} - {{ getModeDisplayName(circlePattern[circleIndex]) }} </span>
+            </div>
           </div>
 
-          <!-- 计时器控制按钮组 -->
+          <div class="timer-mode-buttons">
+            <button @click="setTimerMode('pomodoro')" class="mode-button" :class="{ active: timerMode === 'pomodoro' }">Focus</button>
+            <button @click="setTimerMode('shortBreak')" class="mode-button" :class="{ active: timerMode === 'shortBreak' }">Short</button>
+            <button @click="setTimerMode('longBreak')" class="mode-button" :class="{ active: timerMode === 'longBreak' }">Long</button>
+          </div>
+
           <div class="timer-control-buttons">
-            <!-- 开始按钮 - 计时器运行时禁用 -->
             <button @click="startTimer" class="control-button start-button" :disabled="isRunning">Start</button>
-            <!-- 暂停按钮 - 计时器未运行时禁用 -->
             <button @click="pauseTimer" class="control-button pause-button" :disabled="!isRunning">Pause</button>
-            <!-- 重置按钮 -->
             <button @click="resetTimer" class="control-button reset-button">Reset</button>
+          </div>
+
+          <div class="timer-control-buttons">
+            <!-- 循环按钮 -->
+            <button @click="circleTimer" class="control-button circle-button">Start a circle</button>
           </div>
         </div>
 
-        <!-- 待办事项列表面板 -->
         <div class="todo-panel">
           <h2 class="panel-title">Tasks</h2>
 
-          <!-- 添加待办事项表单 -->
           <div class="add-todo-form">
-            <!-- 输入框，按Enter键可添加任务 -->
             <input v-model="newTodo" @keyup.enter="addTodo" type="text" placeholder="Add a new task..." class="todo-input" />
-            <!-- 添加按钮 -->
             <button @click="addTodo" class="add-button">Add</button>
           </div>
 
-          <!-- 进度条区域 -->
           <div class="progress-container">
             <!-- 进度信息：已完成/总数 和百分比 -->
             <div class="progress-info">
               <span>Progress: {{ completedCount }} of {{ todos.length }}</span>
               <span>{{ Math.round((completedCount / Math.max(todos.length, 1)) * 100) }}%</span>
             </div>
-            <!-- 进度条背景 -->
             <div class="progress-bar-bg">
-              <!-- 进度条填充部分，宽度根据完成百分比动态计算 -->
               <div class="progress-bar-fill" :style="{ width: `${(completedCount / Math.max(todos.length, 1)) * 100}%` }"></div>
             </div>
           </div>
 
-          <!-- 待办事项列表容器 -->
           <div class="todo-list-container">
-            <!-- 当有待办事项时显示列表 -->
             <div v-if="todos.length > 0" class="todo-list">
-              <!-- 遍历待办事项数组，为每个项目创建元素 -->
               <div v-for="(todo, index) in todos" :key="index" class="todo-item">
-                <!-- 任务完成状态复选框 -->
                 <input type="checkbox" :checked="todo.completed" @change="toggleTodo(index)" class="todo-checkbox" />
-                <!-- 任务文本，完成时添加completed类 -->
                 <span class="todo-text" :class="{ completed: todo.completed }">
                   {{ todo.text }}
                   {{ todo.createdAt ? `🗓️  ${new Date(todo.createdAt).toLocaleDateString()}` : "" }}
                 </span>
-                <!-- 任务操作按钮区域 -->
                 <div class="todo-actions">
-                  <!-- 删除任务按钮 -->
                   <button @click="removeTodo(index)" class="todo-action-button delete-button">
                     <!-- 垃圾桶图标 SVG -->
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -94,7 +92,6 @@
               </div>
             </div>
 
-            <!-- 空状态 - 无任务时显示 -->
             <div v-else class="empty-state">
               <!-- 空列表图标 SVG -->
               <svg xmlns="http://www.w3.org/2000/svg" class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -117,14 +114,17 @@
 import { appDataDir, join } from "@tauri-apps/api/path";
 import { exists, mkdir, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+
+// todo列表和输入框
 const todos = ref([]);
 const newTodo = ref("");
 
+// 状态变量
 const timerMode = ref("pomodoro");
 const timerModes = {
-  pomodoro: 25 * 60, // 25分钟的专注时间
-  shortBreak: 5 * 60, // 5分钟的短休息
-  longBreak: 10 * 60, // 10分钟的长休息
+  pomodoro: 2, // 25分钟
+  shortBreak: 2, // 5分钟
+  longBreak: 2, // 10分钟
 };
 
 // 当前计时器的剩余时间
@@ -134,30 +134,50 @@ const isRunning = ref(false);
 // 计时器间隔引用，用于清除定时器
 const timerInterval = ref(null);
 
+// 循环模式的状态
+const circleIndex = ref(0);
+const circlePattern = ["pomodoro", "shortBreak", "pomodoro", "longBreak"];
+const isInCircleMode = ref(false);
+
+// 计算已完成的任务数量
 const completedCount = computed(() => {
   return todos.value.filter((todo) => todo.completed).length;
 });
 
+// 获取模式的显示名称
+const getModeDisplayName = (mode) => {
+  const modeNames = {
+    pomodoro: "Focus",
+    shortBreak: "Short",
+    longBreak: "Long",
+  };
+  return modeNames[mode] || mode;
+};
+
+// 增加待办事项
 const addTodo = () => {
   const text = newTodo.value.trim();
   if (text) {
     todos.value.push({
       text,
       completed: false,
-      createdAt: new Date().toISOString(), // 创建时间
+      createdAt: new Date().toISOString(),
     });
-    newTodo.value = ""; // 清空输入框
+    newTodo.value = "";
   }
 };
 
+// 切换待办事项的完成状态
 const toggleTodo = (index) => {
   todos.value[index].completed = !todos.value[index].completed;
 };
 
+// 删除待办事项
 const removeTodo = (index) => {
   todos.value.splice(index, 1);
 };
 
+// 开始当前计时器
 const startTimer = () => {
   if (isRunning.value) return;
 
@@ -171,6 +191,7 @@ const startTimer = () => {
   }, 1000);
 };
 
+// 暂停当前计时器
 const pauseTimer = () => {
   if (!isRunning.value) return;
 
@@ -178,16 +199,48 @@ const pauseTimer = () => {
   clearInterval(timerInterval.value);
 };
 
+// 重置当前计时器
 const resetTimer = () => {
   pauseTimer();
+  isInCircleMode.value = false;
   timer.value = timerModes[timerMode.value];
 };
 
+// 循环计时器模式
+const circleTimer = () => {
+  isInCircleMode.value = true;
+  circleIndex.value = 0;
+
+  setTimerMode(circlePattern[circleIndex.value]);
+  isInCircleMode.value = true;
+
+  startTimer();
+
+  const checkTimerInterval = setInterval(() => {
+    if (!isRunning.value && isInCircleMode.value && timer.value === 0) {
+      circleIndex.value = (circleIndex.value + 1) % circlePattern.length;
+
+      setTimerMode(circlePattern[circleIndex.value]);
+      isInCircleMode.value = true;
+
+      setTimeout(() => {
+        startTimer();
+      }, 1000);
+    }
+
+    if (!isInCircleMode.value) {
+      clearInterval(checkTimerInterval);
+    }
+  }, 500);
+};
+
+// 设置计时器模式
 const setTimerMode = (mode) => {
   timerMode.value = mode;
   resetTimer();
 };
 
+// 格式化时间为 mm:ss，用于时钟
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
@@ -214,6 +267,7 @@ const ensureLoadsDirectory = async () => {
   }
 };
 
+// 保存待办事项到文件
 const saveTodos = async () => {
   try {
     const loadsDir = await ensureLoadsDirectory();
@@ -228,29 +282,26 @@ const saveTodos = async () => {
   }
 };
 
+// 从文件加载待办事项
 const loadTodos = async () => {
   try {
     const loadsDir = await ensureLoadsDirectory();
     const filePath = await join(loadsDir, "todos.json");
 
-    // 检查文件是否存在
     const fileExists = await exists(filePath);
     if (!fileExists) {
       console.log("待办事项文件尚不存在");
       return;
     }
 
-    // 从文件读取待办事项
     const todosJson = await readTextFile(filePath);
 
-    // 解析JSON并更新待办事项引用
     if (todosJson) {
       todos.value = JSON.parse(todosJson);
       console.log("待办事项加载成功:", filePath);
     }
   } catch (error) {
     console.error("加载待办事项时出错:", error);
-    // 如果加载出错，初始化为空数组
     todos.value = [];
   }
 };
