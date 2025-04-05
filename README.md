@@ -1,16 +1,90 @@
-# Tauri + Vue + TypeScript
+# Nautilus 番茄钟
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+一个简洁高效的番茄钟应用程序，帮助您管理时间和任务。
 
-## Recommended IDE Setup
+![效果图](https://github.com/markzhang12345/GitHubImage/blob/main/Nautilus/2025-4-5.png?raw=true)
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## 功能特点
 
-## Type Support For `.vue` Imports in TS
+### 时间管理
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's Take Over mode by following these steps:
+- **三种时间模式**：专注模式、短休息和长休息
+- **自定义计时器**：灵活设置工作和休息时间
+- **循环模式**：自动按设定的模式循环工作和休息
+- **状态显示**：清晰展示当前模式及循环进度
 
-1. Run `Extensions: Show Built-in Extensions` from VS Code's command palette, look for `TypeScript and JavaScript Language Features`, then right click and select `Disable (Workspace)`. By default, Take Over mode will enable itself if the default TypeScript extension is disabled.
-2. Reload the VS Code window by running `Developer: Reload Window` from the command palette.
+### 任务管理
 
-You can learn more about Take Over mode [here](https://github.com/johnsoncodehk/volar/discussions/471).
+- **待办事项列表**：添加、完成和删除任务
+- **进度追踪**：直观显示任务完成进度和百分比
+- **本地存储**：自动保存任务数据到本地，重启应用后不丢失
+
+## 使用指南
+
+### 计时器
+
+1. 选择时间模式：
+
+   - **专注模式**：用于集中注意力的工作时间段
+   - **短休息**：短暂休息时间
+   - **长休息**：较长的休息时间
+
+2. 控制按钮：
+   - **开始**：启动计时器
+   - **暂停**：暂停计时器
+   - **重置**：重置当前计时器
+   - **开始循环**：启动预设的循环模式，自动切换不同的时间段
+
+### 任务管理
+
+1. 添加任务：在输入框中输入任务内容，按回车键或点击"添加"按钮
+2. 管理任务：
+   - 勾选复选框标记任务完成
+   - 点击删除图标移除任务
+3. 查看进度：界面顶部显示任务完成进度和百分比
+
+## 技术实现
+
+- 前端框架：Vue.js
+- 桌面应用框架：Tauri
+- 数据存储：本地文件系统存储
+
+## 安装与运行
+
+### 安装依赖
+
+```bash
+npm install
+```
+
+### 开发模式运行
+
+```bash
+npm run tauri dev
+```
+
+### 构建应用
+
+```bash
+npm run tauri build
+```
+
+## 文件存储
+
+windows 系统下，任务数据存储在应用数据目录的`AppData/Roaming/com.nautilus.app/loads/todos.json`文件中，确保了数据的持久性和隐私性。
+
+## 后续开发计划
+
+- [ ] 添加通知功能
+- [ ] 自定义循环模式
+- [ ] 数据统计和可视化
+- [ ] 主题切换功能
+- [ ] 任务分类管理
+
+## 贡献指南
+
+欢迎提交问题报告和功能建议，也欢迎通过 Pull Request 贡献代码。
+
+## 许可协议
+
+本项目基于 GNU 通用公共许可证第 3 版 (GPL-3.0) 发布。

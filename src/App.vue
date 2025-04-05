@@ -122,9 +122,9 @@ const newTodo = ref("");
 // 状态变量
 const timerMode = ref("pomodoro");
 const timerModes = {
-  pomodoro: 2, // 25分钟
-  shortBreak: 2, // 5分钟
-  longBreak: 2, // 10分钟
+  pomodoro: 25 * 60, // 25分钟
+  shortBreak: 5 * 60, // 5分钟
+  longBreak: 10 * 60, // 10分钟
 };
 
 // 当前计时器的剩余时间
