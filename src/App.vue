@@ -113,6 +113,7 @@
 <script setup>
 import { appDataDir, join } from "@tauri-apps/api/path";
 import { exists, mkdir, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
+import { isPermissionGranted, requestPermission, sendNotification } from "@tauri-apps/plugin-notification";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 // todo列表和输入框
@@ -122,9 +123,9 @@ const newTodo = ref("");
 // 状态变量
 const timerMode = ref("pomodoro");
 const timerModes = {
-  pomodoro: 25 * 60, // 25分钟
-  shortBreak: 5 * 60, // 5分钟
-  longBreak: 10 * 60, // 10分钟
+  pomodoro: 2, // 25分钟
+  shortBreak: 2, // 5分钟
+  longBreak: 2, // 10分钟
 };
 
 // 当前计时器的剩余时间
@@ -177,6 +178,35 @@ const removeTodo = (index) => {
   todos.value.splice(index, 1);
 };
 
+// 发送通知的函数
+const sendTimerNotification = async () => {
+  try {
+    // 检查通知权限
+    let permissionGranted = await isPermissionGranted();
+    if (!permissionGranted) {
+      const permission = await requestPermission();
+      permissionGranted = permission === "granted";
+    }
+
+    if (permissionGranted) {
+      const mode = timerMode.value;
+      let title = "时间到！";
+      let body = "";
+
+      if (mode === "pomodoro") {
+        body = `你的专注时间已经结束啦！休息一下吧～`;
+      } else if (mode === "shortBreak") {
+        body = `你的短休时间结束啦！继续专注吧～`;
+      } else if (mode === "longBreak") {
+        body = `你的长休结束啦！准备好下一轮专注了吗？`;
+      }
+      sendNotification({ title, body });
+    }
+  } catch (error) {
+    console.error("发送通知时出错:", error);
+  }
+};
+
 // 开始当前计时器
 const startTimer = () => {
   if (isRunning.value) return;
@@ -186,6 +216,8 @@ const startTimer = () => {
     if (timer.value > 0) {
       timer.value--;
     } else {
+      // 计时器结束，发送通知
+      sendTimerNotification();
       pauseTimer();
     }
   }, 1000);
