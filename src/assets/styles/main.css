@@ -1,3 +1,32 @@
+.titlebar {
+  height: 30px;
+  background: #ffffff; /* White background */
+  user-select: none;
+  display: flex;
+  justify-content: flex-end;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999; /* Ensure it stays on top */
+}
+.titlebar-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.titlebar-button:hover {
+  background: #e6e6e6; /* Light gray on hover */
+}
+
+body {
+  margin-top: 30px; /* Same as the titlebar height */
+}
+
 /* Base Styles */
 * {
   box-sizing: border-box;

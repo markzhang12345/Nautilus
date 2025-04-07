@@ -1,4 +1,16 @@
 <template>
+  <div data-tauri-drag-region class="titlebar">
+    <div class="titlebar-button" @click="minimizeWin()" id="titlebar-minimize">
+      <img src="https://api.iconify.design/mdi:window-minimize.svg" alt="minimize" />
+    </div>
+    <div class="titlebar-button" @click="maximizeWin()" id="titlebar-maximize">
+      <img :src="isWindowMaximized ? 'https://api.iconify.design/mdi:window-restore.svg' : 'https://api.iconify.design/mdi:window-maximize.svg'" :alt="isWindowMaximized ? 'restore' : 'maximize'" />
+    </div>
+    <div class="titlebar-button" @click="closeWin()" id="titlebar-close">
+      <img src="https://api.iconify.design/mdi:close.svg" alt="close" />
+    </div>
+  </div>
+
   <div class="app-container">
     <div class="app-content">
       <h1 class="app-title">Nautilus</h1>
@@ -112,9 +124,13 @@
 
 <script setup>
 import { appDataDir, join } from "@tauri-apps/api/path";
+import { Window } from "@tauri-apps/api/window";
 import { exists, mkdir, readTextFile, writeTextFile } from "@tauri-apps/plugin-fs";
 import { isPermissionGranted, requestPermission, sendNotification } from "@tauri-apps/plugin-notification";
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+
+const appWindow = new Window("main");
+const isWindowMaximized = ref(false);
 
 // todo列表和输入框
 const todos = ref([]);
@@ -123,9 +139,9 @@ const newTodo = ref("");
 // 状态变量
 const timerMode = ref("pomodoro");
 const timerModes = {
-  pomodoro: 2, // 25分钟
-  shortBreak: 2, // 5分钟
-  longBreak: 2, // 10分钟
+  pomodoro: 25 * 60, // 25分钟
+  shortBreak: 5 * 60, // 5分钟
+  longBreak: 10 * 60, // 10分钟
 };
 
 // 当前计时器的剩余时间
@@ -139,6 +155,39 @@ const timerInterval = ref(null);
 const circleIndex = ref(0);
 const circlePattern = ["pomodoro", "shortBreak", "pomodoro", "longBreak"];
 const isInCircleMode = ref(false);
+
+// 最小化窗口
+const minimizeWin = async () => {
+  try {
+    await appWindow.minimize();
+  } catch (error) {
+    console.error("最小化窗口时出错:", error);
+  }
+};
+
+// 最大化窗口
+const maximizeWin = async () => {
+  try {
+    const isMaximized = await appWindow.isMaximized();
+    if (isMaximized) {
+      await appWindow.unmaximize();
+      isWindowMaximized.value = false;
+    } else {
+      await appWindow.maximize();
+      isWindowMaximized.value = true;
+    }
+  } catch (error) {
+    console.error("最大化窗口时出错:", error);
+  }
+};
+// 关闭窗口
+const closeWin = async () => {
+  try {
+    await appWindow.close();
+  } catch (error) {
+    console.error("关闭窗口时出错:", error);
+  }
+};
 
 // 计算已完成的任务数量
 const completedCount = computed(() => {
@@ -339,8 +388,14 @@ const loadTodos = async () => {
 };
 
 // 组件挂载后，加载待办事项和请求通知权限
-onMounted(() => {
+onMounted(async () => {
   loadTodos();
+
+  try {
+    isWindowMaximized.value = await appWindow.isMaximized();
+  } catch (error) {
+    console.error("获取窗口状态时出错:", error);
+  }
 });
 
 // 组件卸载前，清除计时器
