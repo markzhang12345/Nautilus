@@ -23,10 +23,6 @@
   background: #e6e6e6; /* Light gray on hover */
 }
 
-body {
-  margin-top: 30px; /* Same as the titlebar height */
-}
-
 /* Base Styles */
 * {
   box-sizing: border-box;
@@ -35,6 +31,9 @@ body {
 }
 
 .app-container {
+  padding-top: 30px;
+  height: 100vh;
+  box-sizing: border-box;
   min-height: 100vh;
   background-color: #f9fafb;
   padding: 1rem;
@@ -42,11 +41,16 @@ body {
 }
 
 .app-content {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
   max-width: 1200px;
   margin: 0 auto;
 }
 
 .app-title {
+  margin-top: 0;
+  padding-top: 10px;
   font-size: 1.875rem;
   font-weight: 700;
   text-align: center;
@@ -441,4 +445,12 @@ body {
   height: 3rem;
   margin: 0 auto 0.75rem;
   color: #9ca3af;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
 }
